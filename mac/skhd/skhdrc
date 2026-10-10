@@ -1,12 +1,14 @@
-#!/bin/zsh
-# skhd (macOS) app shortcuts. The yabai window-management bindings were removed with yabai.
+# skhd — companion to AeroSpace (~/.config/aerospace/aerospace.toml)
+#
+# ONLY the cmd-arrow bindings live here. Real arrow-key events on macOS carry
+# an implicit 'fn' modifier flag, which AeroSpace's hotkey matching does not
+# accept — so AeroSpace never sees cmd-arrows from the keyboard (a synthetic
+# fn-less cmd-left DOES trigger it). skhd's CGEventTap handles arrows fine.
+# Every other binding is defined in AeroSpace itself.
+#
+# Old yabai-era config: skhdrc.yabai.bak
 
-# terminal
-cmd - return : /Applications/alacritty.app/Contents/MacOS/alacritty
-#cmd - enter: open /Applications/kitty.app && osascript -e 'tell application "Finder" to set currentFolder to POSIX path of (target of front Finder window as alias)' -e 'tell application "kitty" to tell current session of current window to write text "cd " & quoted form of currentFolder'
-
-# apps
-cmd + lshift - w: "open /Applications/Visual Studio Code.app"
-cmd - e : $HOME/.config/skhd/open_emacsclient.sh
-cmd - d: dmenu-mac
-lctrl + lshift - p : ~/.config/bin/mpv-url
+cmd - left  : /opt/homebrew/bin/aerospace workspace --wrap-around prev
+cmd - right : /opt/homebrew/bin/aerospace workspace --wrap-around next
+cmd - up    : /opt/homebrew/bin/aerospace focus-monitor prev
+cmd - down  : /opt/homebrew/bin/aerospace focus-monitor next

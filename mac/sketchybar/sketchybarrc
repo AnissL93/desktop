@@ -1,0 +1,52 @@
+#!/bin/bash
+# Status bar for macOS, laid out like the dwm bar + dwmblocks on Linux (desktop/linux/dwm):
+# workspaces and the focused app on the left, weather left of the notch, network | input | memory |
+# battery | date on the right. Colours follow the desktop theme (`theme` writes ~/.config/theme/sketchybar.sh).
+# Each block is plugins/NAME.sh; it prints nothing itself, it sets its item with `sketchybar --set`.
+
+PLUGINS="$CONFIG_DIR/plugins"
+source "$PLUGINS/colors.sh"
+
+TEXT="PxPlus IBM VGA 8x16:Regular:16.0"   # same as dmenu; 16 = native size, crisp
+ICON="typicons:Regular:16.0"
+CJK="Cubic 11:Regular:16.0"
+
+sketchybar --bar position=top height=32 color="$BAR_BG" \
+    --default icon.font="$ICON" label.font="$TEXT" icon.color="$BAR_FG" label.color="$BAR_FG" \
+              padding_left=4 padding_right=4 icon.padding_right=6
+
+# ---- left: workspaces (dwm tags) and the focused app ----
+sketchybar --add event aerospace_workspace_change
+for sid in $(aerospace list-workspaces --all); do
+    sketchybar --add item "space.$sid" left \
+        --set "space.$sid" icon.drawing=off label="$sid" label.padding_left=8 label.padding_right=8 \
+              padding_left=0 padding_right=0 background.color="$SEL_BG" background.height=32 \
+              updates=on script="$PLUGINS/space.sh $sid" click_script="aerospace workspace $sid" \
+        --subscribe "space.$sid" aerospace_workspace_change front_app_switched
+done
+sketchybar --add item front_app left \
+    --set front_app icon.drawing=off padding_left=12 script="$PLUGINS/front_app.sh" \
+    --subscribe front_app front_app_switched
+
+# ---- right: dwmblocks, rightmost first ----
+block() {   # block NAME UPDATE_SECONDS [EVENT...]: a status block run by plugins/NAME.sh, " | " on its right
+    local name=$1 freq=$2; shift 2
+    if [ -n "$seen" ]; then
+        sketchybar --add item "sep.$name" right --set "sep.$name" icon.drawing=off label="|" label.color="$DIM"
+    fi
+    seen=1
+    sketchybar --add item "$name" right --set "$name" update_freq="$freq" script="$PLUGINS/$name.sh"
+    [ $# -eq 0 ] || sketchybar --subscribe "$name" "$@"
+}
+block date 30
+block battery 60 power_source_change system_woke
+block memory 10 mouse.clicked
+block input 1
+block network 2
+
+# weather sits left of the MacBook notch (position q); there is no room for it on the right
+sketchybar --add item weather q --set weather update_freq=3600 script="$PLUGINS/weather.sh" \
+           --subscribe weather mouse.clicked system_woke
+sketchybar --set input label.font="$CJK"
+
+sketchybar --update

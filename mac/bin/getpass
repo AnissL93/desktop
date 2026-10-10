@@ -1,0 +1,7 @@
+#!/bin/bash
+# Pick a `pass` entry and copy it to the clipboard (45 s); desktop/linux/scripts/getpass on macOS.
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"           # also when run from a hotkey or launcher
+store="${PASSWORD_STORE_DIR:-$HOME/.password-store}"
+sel=$(cd "$store" && find . -name '*.gpg' | sed 's|^\./||; s|\.gpg$||' | sort | dmenu -i -p pass) || exit 0
+[ -n "$sel" ] || exit 0
+pass -c "$sel" && osascript -e "display notification \"Copied $sel to the clipboard; clears in 45 seconds\" with title \"Pass\""
