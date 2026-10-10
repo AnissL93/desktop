@@ -1,6 +1,6 @@
 #!/bin/bash
 # Weather from wttr.in, refreshed once a day, like desktop/linux/scripts/show_weather; the
-# condition as a typicon, then "place: temperature humidity". Click: the full report.
+# condition as a typicon, then "temperature humidity" (no place name: the bar is short of room). Click: the full report.
 source "$CONFIG_DIR/plugins/colors.sh"
 report="${XDG_DATA_HOME:-$HOME/.local/share}/weatherreport"
 brief="${report}_brief"
@@ -9,7 +9,7 @@ brief="${report}_brief"
 if [ "$(stat -f %Sm -t %F "$report" 2>/dev/null)" != "$(date +%F)" ]; then
     mkdir -p "$(dirname "$report")"
     curl -sf "wttr.in/" > "$report"
-    curl -sf "wttr.in/Markethill?format=%c|%l:+%t+%h" > "$brief"
+    curl -sf "wttr.in/Markethill?format=%c|%t+%h" > "$brief"
 fi
 IFS='|' read -r cond text < "$brief"                             # no trailing newline: read fails
 [ -n "$text" ] || exit
