@@ -45,10 +45,15 @@ moves it there (it leaves the previous one).
 
 ## Window focus & movement
 
+Same keys as dwm (`desktop/linux/dwm/config.def.h`):
+
 | Keys | Action |
 |------|--------|
-| `cmd-h` / `cmd-j` / `cmd-k` / `cmd-l` | Focus window left / down / up / right |
-| `cmd-shift-h/j/k/l` | Move window left / down / up / right |
+| `cmd-j` / `cmd-k` | Focus next / previous window (wraps around, like dwm's stack) |
+| `cmd-shift-j` / `cmd-shift-k` | Swap the window with the next / previous one (dwm `movestack`) |
+| `cmd-h` / `cmd-l` | Shrink / grow the focused window (dwm `setmfact`) |
+| `cmd-shift-h` / `cmd-shift-l` | Move window left / right |
+| `cmd-shift-comma` / `cmd-shift-period` | Send window to the previous / next monitor (dwm `tagmon`) |
 | `cmd-m` | Toggle fullscreen |
 | `cmd-q` | Close focused window (intercepts the macOS "quit app" shortcut — quit via the app menu) |
 
@@ -58,6 +63,7 @@ moves it there (it leaves the previous one).
 |------|--------|
 | `cmd-shift-\` | Tiles layout (horizontal/vertical) |
 | `cmd-shift-/` | Accordion layout (horizontal/vertical) |
+| `cmd-shift-space` | Toggle tiles / accordion (dwm `cyclelayout`; `cmd-space` stays Spotlight) |
 | `cmd-shift-f` | Toggle floating / tiling for the focused window |
 
 ## Resize
@@ -94,12 +100,20 @@ Enter with `cmd-shift-m` (exit with `enter` / `esc`):
 |------|--------|
 | `cmd-enter` | New Alacritty window |
 | `cmd-e` | Open Emacs (`emacsclient`) |
+| `cmd-d` | dmenu: launch an app or command (`desktop/mac/dmenu`, `~/.local/bin/dmenu_run`) |
+| `cmd-shift-d` | Emoji picker (the macOS one, `ctrl-cmd-space`) |
+| `cmd-shift-w` | New Firefox window |
+| `cmd-shift-e` | emacs-everywhere: edit the focused text field in Emacs |
+| `cmd-shift-b` | Hide / show SketchyBar (dwm `togglebar`) |
+
+Core macOS app shortcuts (`cmd-c/v/x/z/s/t/w/f/space/tab`) are left alone.
 
 ## Config maintenance
 
 | Keys | Action |
 |------|--------|
 | `cmd-shift-c` | Reload AeroSpace config |
+| `cmd-shift-f5` | Reload AeroSpace and SketchyBar (dwm: reload colours) |
 | `alt-shift-r` | Reload SketchyBar (kept on alt — cmd-shift-r is resize mode) |
 
 Or from the terminal:
@@ -142,7 +156,7 @@ To cover another browser, add a rule above the generic ones with its `app-id`
 - **[SketchyBar](https://github.com/FelixKratz/SketchyBar)** — status bar, triggered on workspace change and started on launch.
 - **[JankyBorders](https://github.com/FelixKratz/JankyBorders)** — active/inactive window borders, started on launch.
 - **[skhd](https://github.com/koekeishiya/skhd)** — owns ONLY the four `cmd-arrow` bindings
-  (config: `Dotfiles/skhd/skhdrc`, runs as a launchd service). Real arrow-key events carry
+  (config: `desktop/mac/skhd/skhdrc`, runs as a launchd service). Real arrow-key events carry
   an implicit `fn` modifier flag that AeroSpace's hotkey matching rejects, so AeroSpace
   never sees `cmd-arrows` from a physical keyboard; skhd's event tap does, and shells out
   to the `aerospace` CLI. Restart after config changes: `skhd --restart-service`.
