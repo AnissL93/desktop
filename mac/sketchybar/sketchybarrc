@@ -45,8 +45,9 @@ block memory 10 mouse.clicked
 block input 1
 block network 2
 
-# weather sits left of the MacBook notch (position q); there is no room for it on the right
-sketchybar --add item weather q --set weather update_freq=3600 script="$PLUGINS/weather.sh" \
+# weather sits left of the MacBook notch (position q); there is no room for it on the right.
+# padding_right keeps it clear of CodeIsland, which draws around the notch
+sketchybar --add item weather q --set weather update_freq=3600 script="$PLUGINS/weather.sh" padding_right=70 \
            --subscribe weather mouse.clicked system_woke
 sketchybar --set input label.font="$CJK"
 
