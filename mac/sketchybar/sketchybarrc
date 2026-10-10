@@ -10,22 +10,23 @@ source "$PLUGINS/colors.sh"
 TEXT="PxPlus IBM VGA 8x16:Regular:16.0"   # same as dmenu; 16 = native size, crisp
 ICON="typicons:Regular:16.0"
 CJK="Cubic 11:Regular:16.0"
+TAGS="Symbols Nerd Font Mono:Regular:16.0"   # workspace + app icons, as dwm's tag font
 
 sketchybar --bar position=top height=32 color="$BAR_BG" \
     --default icon.font="$ICON" label.font="$TEXT" icon.color="$BAR_FG" label.color="$BAR_FG" \
               padding_left=4 padding_right=4 icon.padding_right=6
 
-# ---- left: workspaces (dwm tags) and the focused app ----
+# ---- left: workspaces (dwm tags: number icon + app icons, all shown) and the focused app ----
 sketchybar --add event aerospace_workspace_change
 for sid in $(aerospace list-workspaces --all); do
     sketchybar --add item "space.$sid" left \
-        --set "space.$sid" icon.drawing=off label="$sid" label.padding_left=8 label.padding_right=8 \
+        --set "space.$sid" icon.drawing=off label.font="$TAGS" label.padding_left=8 label.padding_right=8 \
               padding_left=0 padding_right=0 background.color="$SEL_BG" background.height=32 \
-              updates=on script="$PLUGINS/space.sh $sid" click_script="aerospace workspace $sid" \
-        --subscribe "space.$sid" aerospace_workspace_change front_app_switched
+              script="$PLUGINS/space.sh $sid" click_script="aerospace workspace $sid" \
+        --subscribe "space.$sid" aerospace_workspace_change front_app_switched space_windows_change
 done
 sketchybar --add item front_app left \
-    --set front_app icon.drawing=off padding_left=12 script="$PLUGINS/front_app.sh" \
+    --set front_app icon.drawing=off padding_left=12 label.max_chars=20 script="$PLUGINS/front_app.sh" \
     --subscribe front_app front_app_switched
 
 # ---- right: dwmblocks, rightmost first ----
