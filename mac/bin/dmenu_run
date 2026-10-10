@@ -1,0 +1,8 @@
+#!/bin/bash
+# dmenu_run for macOS: apps and $PATH commands in dmenu; an app opens with `open -a`, a command runs detached.
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
+sel=$( { find /Applications /System/Applications ~/Applications -maxdepth 2 -name '*.app' 2>/dev/null |
+         sed 's|.*/||; s|\.app$||'
+         IFS=:; for d in $PATH; do ls "$d" 2>/dev/null; done; } | sort -u | dmenu "$@" ) || exit 0
+[ -n "$sel" ] || exit 0
+open -a "$sel" 2>/dev/null || nohup sh -c "$sel" >/dev/null 2>&1 &

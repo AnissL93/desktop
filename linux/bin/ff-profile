@@ -1,6 +1,7 @@
 #!/bin/sh
 # Print the Firefox profile directory in use: the one whose prefs.js changed most recently.
-# Exit 1 if there is none yet (start Firefox once first).
-p=$(ls -t "$HOME"/.config/mozilla/firefox/*/prefs.js "$HOME"/.mozilla/firefox/*/prefs.js 2>/dev/null | head -1)
+# Exit 1 if there is none yet (start Firefox once first). Linux and macOS profile folders.
+p=$(ls -t "$HOME"/.config/mozilla/firefox/*/prefs.js "$HOME"/.mozilla/firefox/*/prefs.js \
+    "$HOME"/Library/Application\ Support/Firefox/Profiles/*/prefs.js 2>/dev/null | head -1)
 [ -n "$p" ] || exit 1
 dirname "$p"

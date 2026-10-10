@@ -9,7 +9,15 @@ after-login-command = []
 after-startup-command = [
     # JankyBorders has a built-in detection of already running process,
     # so it won't be run twice on AeroSpace restart
-    'exec-and-forget borders active_color=0xff1688f0 inactive_color=0xff494d64 width=6.0'
+    'exec-and-forget /opt/homebrew/opt/sketchybar/bin/sketchybar',
+    # no arguments: borders reads ~/.config/borders/bordersrc (colours from the desktop theme)
+    'exec-and-forget borders'
+]
+
+exec-on-workspace-change = [
+    '/bin/bash',
+    '-c',
+    '/opt/homebrew/opt/sketchybar/bin/sketchybar --trigger aerospace_workspace_change AEROSPACE_FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE AEROSPACE_PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE',
 ]
 
 # Start AeroSpace at login
@@ -58,12 +66,17 @@ preset = 'qwerty'
 #                 Monitor pattern is the same as for 'workspace-to-monitor-force-assignment'.
 #                 See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [gaps]
-inner.horizontal = 10
-inner.vertical = 10
-outer.left = 10
-outer.bottom = 10
-outer.top = 40
-outer.right = 10
+inner.horizontal = 13
+inner.vertical = 13
+outer.left = 13
+outer.bottom = 13
+outer.top = 36
+outer.right = 13
+
+# NOTE: No [workspace-to-monitor-force-assignment] here on purpose.
+# We want dwm-style behavior: a workspace is summoned onto whatever monitor
+# is currently focused (see the cmd-N bindings using 'summon-workspace').
+# Force-assigning a workspace would pin it to one monitor and break summoning.
 
 # See https://nikitabobko.github.io/AeroSpace/guide#exec-env-vars
 [exec] # Again, you don't need to copy all config sections to your config.
@@ -96,39 +109,57 @@ PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
 # cmd-enter = 'exec-and-forget open -n /System/Applications/Utilities/Terminal.app'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#layout
-cmd-slash = 'layout accordion horizontal vertical'
-cmd-backslash = 'layout tiles horizontal vertical'
+cmd-shift-slash = 'layout accordion horizontal vertical'
+cmd-shift-backslash = 'layout tiles horizontal vertical'
+
 
 # alt-enter = 'exec-and-forget open -n /Applications/Alacritty.app' # use Super + N to open new alacritty terminal
 cmd-enter = 'exec-and-forget open -n /Applications/Alacritty.app' # use Super + N to open new alacritty terminal 
-cmd-shift-w = 'exec-and-forget open -n /Applications/Firefox.app' # use Super + N to open new alacritty terminal 
-cmd-shift-e = 'exec-and-forget emacsclient -c --alternate-editor=emacs --no-wait $@'
+cmd-e = 'exec-and-forget emacsclient -c --alternate-editor=emacs --no-wait $@'
+
+# Keys follow dwm on Linux (desktop/linux/dwm/config.def.h), with Cmd as Mod. dwm keys that are core
+# macOS app shortcuts stay with the apps: Cmd-V/F/T/O/I/U/Y/Space/comma/period (paste, find, new tab,
+# ...), and Mod+Tab (Cmd-Tab is the app switcher: alt-tab below).
+cmd-d = 'exec-and-forget $HOME/.local/bin/dmenu_run'             # dmenu (desktop/mac/dmenu)
+cmd-shift-d = "exec-and-forget osascript -e 'tell application \"System Events\" to key code 49 using {control down, command down}'"  # emoji picker (show_emoji)
+cmd-shift-w = 'exec-and-forget /Applications/Firefox.app/Contents/MacOS/firefox --new-window'
+cmd-shift-e = "exec-and-forget emacsclient -a '' --eval '(emacs-everywhere)'"  # edit any text field in Emacs (everywhere)
+cmd-shift-b = 'exec-and-forget sketchybar --bar hidden=toggle'   # togglebar
+cmd-shift-space = 'layout tiles accordion'                        # cyclelayout (Cmd-Space stays Spotlight)
+cmd-shift-f5 = ['reload-config', 'exec-and-forget sketchybar --reload']   # dwm: reload colours (xrdb)
+cmd-shift-comma = 'move-node-to-monitor --wrap-around prev'      # tagmon
+cmd-shift-period = 'move-node-to-monitor --wrap-around next'
 cmd-q = 'close'
 
 cmd-m = 'fullscreen'
-cmd-left = 'workspace --wrap-around prev'
-cmd-right = 'workspace --wrap-around next'
-cmd-up = 'focus-monitor prev'
-cmd-down = 'focus-monitor next'
-cmd-shift-leftSquareBracket = 'move-workspace-to-monitor prev'
-cmd-shift-rightSquareBracket = 'move-workspace-to-monitor next'
-alt-shift-c = 'reload-config'
+# NOTE: cmd-arrow bindings are handled by skhd (~/.config/skhd/skhdrc), not here.
+# Hardware arrow-key events carry an implicit 'fn' flag that AeroSpace's hotkey
+# matching rejects, so these bindings never fire from a real keyboard:
+#   cmd-left  -> workspace --wrap-around prev
+#   cmd-right -> workspace --wrap-around next
+#   cmd-up    -> focus-monitor prev
+#   cmd-down  -> focus-monitor next
+cmd-shift-leftSquareBracket = 'move-workspace-to-monitor --wrap-around prev'
+cmd-shift-rightSquareBracket = 'move-workspace-to-monitor --wrap-around next'
+cmd-shift-c = 'reload-config'
 cmd-shift-f = 'layout floating tiling' # 'floating toggle' in i3
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
 cmd-shift-m = 'mode manage'
 cmd-shift-r = 'mode resize'
 
-# See: https://nikitabobko.github.io/AeroSpace/commands#focus
-cmd-h = 'focus left'
-cmd-j = 'focus down'
-cmd-k = 'focus up'
-cmd-l = 'focus right'
+# dwm stack keys: Mod+j/k focus the next/previous window, Mod+Shift+j/k push it along the stack,
+# Mod+h/l shrink/grow the master area. AeroSpace has no master/stack: its window (dfs) order is the
+# stack, and h/l resize the focused window.
+cmd-j = 'focus --wrap-around dfs-next'
+cmd-k = 'focus --wrap-around dfs-prev'
+cmd-h = 'resize smart -50'
+cmd-l = 'resize smart +50'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#move
 cmd-shift-h = 'move left'
-cmd-shift-j = 'move down'
-cmd-shift-k = 'move up'
+cmd-shift-j = 'swap --swap-focus --wrap-around dfs-next'
+cmd-shift-k = 'swap --swap-focus --wrap-around dfs-prev'
 cmd-shift-l = 'move right'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#resize
@@ -136,16 +167,21 @@ cmd-shift-minus = 'resize smart -50'
 cmd-shift-equal = 'resize smart +50'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
-cmd-1 = 'workspace 1'
-cmd-2 = 'workspace 2'
-cmd-3 = 'workspace 3'
-cmd-4 = 'workspace 4'
-cmd-5 = 'workspace 5'
-cmd-6 = 'workspace 6'
-cmd-7 = 'workspace 7'
-cmd-8 = 'workspace 8'
-cmd-9 = 'workspace 9'
-cmd-0 = 'workspace 10'
+# dwm-style: 'summon-workspace' pulls workspace N onto the CURRENTLY FOCUSED
+# monitor and focuses it (instead of jumping focus to the workspace's home).
+# Workflow: focus a monitor (cmd-up / cmd-down), then press cmd-N to bring
+# that workspace onto the screen you're looking at.
+# See: https://nikitabobko.github.io/AeroSpace/commands#summon-workspace
+cmd-1 = 'summon-workspace 1'
+cmd-2 = 'summon-workspace 2'
+cmd-3 = 'summon-workspace 3'
+cmd-4 = 'summon-workspace 4'
+cmd-5 = 'summon-workspace 5'
+cmd-6 = 'summon-workspace 6'
+cmd-7 = 'summon-workspace 7'
+cmd-8 = 'summon-workspace 8'
+cmd-9 = 'summon-workspace 9'
+cmd-0 = 'summon-workspace 10'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
 cmd-shift-1 = 'move-node-to-workspace 1'
@@ -159,21 +195,29 @@ cmd-shift-8 = 'move-node-to-workspace 8'
 cmd-shift-9 = 'move-node-to-workspace 9'
 cmd-shift-0 = 'move-node-to-workspace 10'
 
-cmd-ctrl-1 = ['move-node-to-workspace 1', 'workspace 1']
-cmd-ctrl-2 = ['move-node-to-workspace 2', 'workspace 2']
-cmd-ctrl-3 = ['move-node-to-workspace 3', 'workspace 3']
-cmd-ctrl-4 = ['move-node-to-workspace 4', 'workspace 4']
-cmd-ctrl-5 = ['move-node-to-workspace 5', 'workspace 5']
-cmd-ctrl-6 = ['move-node-to-workspace 6', 'workspace 6']
-cmd-ctrl-7 = ['move-node-to-workspace 7', 'workspace 7']
-cmd-ctrl-8 = ['move-node-to-workspace 8', 'workspace 8']
-cmd-ctrl-9 = ['move-node-to-workspace 9', 'workspace 9']
-cmd-ctrl-0 = ['move-node-to-workspace 10', 'workspace 10']
+cmd-ctrl-1 = ['move-node-to-workspace 1', 'summon-workspace 1']
+cmd-ctrl-2 = ['move-node-to-workspace 2', 'summon-workspace 2']
+cmd-ctrl-3 = ['move-node-to-workspace 3', 'summon-workspace 3']
+cmd-ctrl-4 = ['move-node-to-workspace 4', 'summon-workspace 4']
+cmd-ctrl-5 = ['move-node-to-workspace 5', 'summon-workspace 5']
+cmd-ctrl-6 = ['move-node-to-workspace 6', 'summon-workspace 6']
+cmd-ctrl-7 = ['move-node-to-workspace 7', 'summon-workspace 7']
+cmd-ctrl-8 = ['move-node-to-workspace 8', 'summon-workspace 8']
+cmd-ctrl-9 = ['move-node-to-workspace 9', 'summon-workspace 9']
+cmd-ctrl-0 = ['move-node-to-workspace 10', 'summon-workspace 10']
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
+# NOTE: kept on alt — cmd-tab is reserved by the macOS app switcher and can't be intercepted.
 alt-tab = 'workspace-back-and-forth'
 # See: https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
 cmd-shift-tab = 'move-workspace-to-monitor --wrap-around next'
+
+# Swap the visible workspaces between the two monitors (script-driven).
+cmd-shift-s = 'exec-and-forget /Users/hylan/.config/aerospace/scripts/swap-monitors.sh'
+
+# Reload sketchybar
+# NOTE: kept on alt — cmd-shift-r is already taken by 'mode resize' above.
+alt-shift-r = ['exec-and-forget /opt/homebrew/bin/sketchybar --reload']
 
 # 'manage' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -183,16 +227,19 @@ c = ['reload-config', 'mode main'] # reload config
 esc = [
   'reload-config',
   'mode main',
+  'exec-and-forget sketchybar --trigger aerospace_leave_service_mode',
 ]
 r = ['flatten-workspace-tree', 'mode main'] # reset layout
 #s = ['layout sticky tiling', 'mode main'] # sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
 f = [
     'layout floating tiling',
     'mode main',
+    'exec-and-forget sketchybar --trigger aerospace_leave_service_mode',
 ] # Toggle between floating and tiling layout
 backspace = [
   'close-all-windows-but-current',
   'mode main',
+  'exec-and-forget sketchybar --trigger aerospace_leave_service_mode',
 ]
 
 h = ['join-with left', 'mode main']
@@ -208,20 +255,36 @@ l = 'resize width +50'
 enter = 'mode main'
 esc = 'mode main'
 
+# --- Picture-in-Picture video: keep it FLOATING (never tiled) ---
+# These PiP rules MUST come before the generic Firefox->workspace-10 rule:
+# AeroSpace only runs the FIRST matching on-window-detected rule, so without
+# this ordering a Firefox PiP window would be sent to workspace 10 instead.
+#
+# NOTE on "sticky": AeroSpace cannot pin a window so it's visible on every
+# workspace — that's an open upstream limitation (issue #2). A floating window
+# still hides when you switch away from its workspace. See README for the
+# multi-monitor workaround (park PiP on one screen, work on the other).
+[[on-window-detected]]
+if.app-id = 'org.mozilla.firefox'
+if.window-title-regex-substring = "Picture-in-Picture"
+if.during-aerospace-startup = false
+run = "layout floating"
+
+[[on-window-detected]]
+if.app-id = 'app.floorp.Floorp'
+if.window-title-regex-substring = "Picture-in-Picture"
+if.during-aerospace-startup = false
+run = "layout floating"
+
+# Generic Firefox windows go to workspace 10.
 [[on-window-detected]]
 if.app-id = 'org.mozilla.firefox'
 run = 'move-node-to-workspace 10'
 
 [[on-window-detected]]
-if.app-id = 'org.mozilla.floorp'
-if.window-title-regex-substring = "Picture-in-Picture"
+if.window-title-regex-substring = "mpv"
 if.during-aerospace-startup = false
 run =  "layout floating"
 
-[[on-window-detected]]
-if.app-id = 'org.mozilla.floorp'
-if.window-title-regex-substring = "Picture-in-Picture"
-if.during-aerospace-startup = false
-run =  "move-node-to-workspace $AEROSPACE_FOCUSED_WORKSPACE"
-
 #exec-on-workspace-change = ['$HOME/.config/aerospace/scripts/on-ws-change.sh']
+
