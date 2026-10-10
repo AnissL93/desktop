@@ -1,8 +1,12 @@
 #!/bin/bash
-# dmenu_run for macOS: apps and $PATH commands in dmenu; an app opens with `open -a`, a command runs detached.
+# dmenu_run for macOS: apps and $PATH commands in dmenu; an app opens with `open -a` (Firefox: new window), a command runs detached.
 export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
 sel=$( { find /Applications /System/Applications ~/Applications -maxdepth 2 -name '*.app' 2>/dev/null |
          sed 's|.*/||; s|\.app$||'
          IFS=:; for d in $PATH; do ls "$d" 2>/dev/null; done; } | sort -u | dmenu "$@" ) || exit 0
 [ -n "$sel" ] || exit 0
+shopt -s nocasematch   # typed `firefox` matches no item (dmenu is case-sensitive) and comes back as typed
+case $sel in   # Firefox: a new window each time (`open -a` only focuses the running one)
+    Firefox) exec /Applications/Firefox.app/Contents/MacOS/firefox --new-window ;;
+esac
 open -a "$sel" 2>/dev/null || nohup sh -c "$sel" >/dev/null 2>&1 &

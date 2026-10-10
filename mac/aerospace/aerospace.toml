@@ -256,10 +256,6 @@ enter = 'mode main'
 esc = 'mode main'
 
 # --- Picture-in-Picture video: keep it FLOATING (never tiled) ---
-# These PiP rules MUST come before the generic Firefox->workspace-10 rule:
-# AeroSpace only runs the FIRST matching on-window-detected rule, so without
-# this ordering a Firefox PiP window would be sent to workspace 10 instead.
-#
 # NOTE on "sticky": AeroSpace cannot pin a window so it's visible on every
 # workspace — that's an open upstream limitation (issue #2). A floating window
 # still hides when you switch away from its workspace. See README for the
@@ -275,11 +271,6 @@ if.app-id = 'app.floorp.Floorp'
 if.window-title-regex-substring = "Picture-in-Picture"
 if.during-aerospace-startup = false
 run = "layout floating"
-
-# Generic Firefox windows go to workspace 10.
-[[on-window-detected]]
-if.app-id = 'org.mozilla.firefox'
-run = 'move-node-to-workspace 10'
 
 [[on-window-detected]]
 if.window-title-regex-substring = "mpv"

@@ -125,11 +125,9 @@ aerospace reload-config
 ## Auto window rules
 
 Defined via `on-window-detected` in `aerospace.toml`. Only the **first** matching
-rule runs, so order matters — the Picture-in-Picture rules are listed before the
-generic Firefox rule on purpose.
+rule runs, so order matters. Firefox opens on the current workspace.
 
 - **Firefox / Floorp Picture-in-Picture** → floating
-- **Firefox** (other windows) → opens on workspace 10
 - **mpv** → floating
 
 ### Picture-in-Picture video
