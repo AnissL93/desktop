@@ -1,5 +1,5 @@
 #!/bin/bash
-# dmenu_run for macOS: apps and $PATH commands in dmenu; an app opens with `open -a` (Firefox: new window), a command runs detached.
+# dmenu_run for macOS: apps and $PATH commands in dmenu. An app opens with `open -a` (Firefox: a new window), a command runs detached.
 export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
 sel=$( { find /Applications /System/Applications ~/Applications -maxdepth 2 -name '*.app' 2>/dev/null |
          sed 's|.*/||; s|\.app$||'

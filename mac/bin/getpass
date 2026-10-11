@@ -1,5 +1,5 @@
 #!/bin/bash
-# Pick a `pass` entry and copy it to the clipboard (45 s); desktop/linux/scripts/getpass on macOS.
+# Pick a `pass` entry and copy it to the clipboard for 45 s, like desktop/linux/scripts/getpass.
 export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"           # also when run from a hotkey or launcher
 store="${PASSWORD_STORE_DIR:-$HOME/.password-store}"
 sel=$(cd "$store" && find . -name '*.gpg' | sed 's|^\./||; s|\.gpg$||' | sort | dmenu -i -p pass) || exit 0

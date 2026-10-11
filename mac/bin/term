@@ -1,6 +1,6 @@
 #!/bin/sh
-# term [CMD...]: a new kitty window, in the running kitty when there is one (instant; starting kitty
-# takes ~1 s). kitty listens on /tmp/kitty-$USER-<pid> (dotfiles/kitty/kitty.conf).
+# term [CMD...]: a new kitty window, in the running kitty when there is one (instant, while starting
+# kitty takes ~1 s). kitty listens on /tmp/kitty-$USER-<pid> (dotfiles/kitty/kitty.conf).
 export PATH=/opt/homebrew/bin:$PATH
 for s in /tmp/kitty-"$USER"-*; do
     # kitty is in the background: `open -a` brings it, and so the new window, to the front
