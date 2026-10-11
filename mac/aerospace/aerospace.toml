@@ -70,7 +70,7 @@ inner.horizontal = 13
 inner.vertical = 13
 outer.left = 13
 outer.bottom = 13
-outer.top = 36
+outer.top = 40
 outer.right = 13
 
 # NOTE: No [workspace-to-monitor-force-assignment] here on purpose.
@@ -118,8 +118,9 @@ cmd-enter = 'exec-and-forget $HOME/.local/bin/term'          # kitty window (st 
 cmd-e = 'exec-and-forget emacsclient -c --alternate-editor=emacs --no-wait $@'
 
 # Keys follow dwm on Linux (desktop/linux/dwm/config.def.h), with Cmd as Mod. dwm keys that are core
-# macOS app shortcuts stay with the apps: Cmd-V/F/T/O/I/U/Y/Space/comma/period (paste, find, new tab,
+# macOS app shortcuts stay with the apps: Cmd-V/F/T/O/I/U/Y/Space (paste, find, new tab,
 # ...), and Mod+Tab (Cmd-Tab is the app switcher: alt-tab below).
+# Cmd-comma/period are focusmon, as in dwm (app Settings stays in the app menu).
 cmd-d = 'exec-and-forget $HOME/.local/bin/dmenu_run'             # dmenu (desktop/mac/dmenu)
 cmd-shift-d = "exec-and-forget osascript -e 'tell application \"System Events\" to key code 49 using {control down, command down}'"  # emoji picker (show_emoji)
 cmd-shift-w = 'exec-and-forget /Applications/Firefox.app/Contents/MacOS/firefox --new-window'
@@ -127,6 +128,8 @@ cmd-shift-e = "exec-and-forget emacsclient -a '' --eval '(emacs-everywhere)'"  #
 cmd-shift-b = 'exec-and-forget sketchybar --bar hidden=toggle'   # togglebar
 cmd-shift-space = 'layout tiles accordion'                        # cyclelayout (Cmd-Space stays Spotlight)
 cmd-shift-f5 = ['reload-config', 'exec-and-forget sketchybar --reload']   # dwm: reload colours (xrdb)
+cmd-comma = 'focus-monitor --wrap-around prev'                    # focusmon
+cmd-period = 'focus-monitor --wrap-around next'
 cmd-shift-comma = 'move-node-to-monitor --wrap-around prev'      # tagmon
 cmd-shift-period = 'move-node-to-monitor --wrap-around next'
 cmd-q = 'close'
@@ -137,8 +140,6 @@ cmd-m = 'fullscreen'
 # matching rejects, so these bindings never fire from a real keyboard:
 #   cmd-left  -> workspace --wrap-around prev
 #   cmd-right -> workspace --wrap-around next
-#   cmd-up    -> focus-monitor prev
-#   cmd-down  -> focus-monitor next
 cmd-shift-leftSquareBracket = 'move-workspace-to-monitor --wrap-around prev'
 cmd-shift-rightSquareBracket = 'move-workspace-to-monitor --wrap-around next'
 cmd-shift-c = 'reload-config'
@@ -169,7 +170,7 @@ cmd-shift-equal = 'resize smart +50'
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
 # dwm-style: 'summon-workspace' pulls workspace N onto the CURRENTLY FOCUSED
 # monitor and focuses it (instead of jumping focus to the workspace's home).
-# Workflow: focus a monitor (cmd-up / cmd-down), then press cmd-N to bring
+# Workflow: focus a monitor (cmd-comma / cmd-period), then press cmd-N to bring
 # that workspace onto the screen you're looking at.
 # See: https://nikitabobko.github.io/AeroSpace/commands#summon-workspace
 cmd-1 = 'summon-workspace 1'

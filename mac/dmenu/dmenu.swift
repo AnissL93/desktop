@@ -15,7 +15,7 @@ import Cocoa
 
 var prompt = "", insensitive = false, bottom = false, lines = 0
 var fontName = "PxPlus IBM VGA 8x16"
-let fontSize: CGFloat = 16, rowHeight: CGFloat = 32          // the SketchyBar height
+let fontSize: CGFloat = 24, rowHeight: CGFloat = 36          // the SketchyBar font and height
 var nb = "#222222", nf = "#bbbbbb", sb = "#005577", sf = "#eeeeee"   // dmenu's own defaults
 
 // theme colours: BAR_BG=0xffRRGGBB lines

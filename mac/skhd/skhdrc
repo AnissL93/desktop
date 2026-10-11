@@ -5,10 +5,8 @@
 # accept — so AeroSpace never sees cmd-arrows from the keyboard (a synthetic
 # fn-less cmd-left DOES trigger it). skhd's CGEventTap handles arrows fine.
 # Every other binding is defined in AeroSpace itself.
-#
-# Old yabai-era config: skhdrc.yabai.bak
+
 
 cmd - left  : /opt/homebrew/bin/aerospace workspace --wrap-around prev
 cmd - right : /opt/homebrew/bin/aerospace workspace --wrap-around next
-cmd - up    : /opt/homebrew/bin/aerospace focus-monitor prev
-cmd - down  : /opt/homebrew/bin/aerospace focus-monitor next
+# the other monitor is cmd-comma / cmd-period in AeroSpace, as in dwm's focusmon

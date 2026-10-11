@@ -19,7 +19,7 @@ Workspaces are **not pinned** to monitors. Instead, a workspace is *summoned* on
 whichever monitor is currently focused — like dwm tags.
 
 **Workflow:**
-1. Focus the monitor you want with `cmd-up` / `cmd-down`.
+1. Focus the monitor you want with `cmd-comma` / `cmd-period` (dwm `focusmon`).
 2. Press `cmd-<n>` — that workspace appears on the focused monitor and is focused.
 
 A workspace can only live on one monitor at a time; summoning it to another monitor
@@ -27,7 +27,8 @@ moves it there (it leaves the previous one).
 
 | Keys | Action |
 |------|--------|
-| `cmd-up` / `cmd-down` | Focus previous / next monitor *(via skhd)* |
+| `cmd-comma` / `cmd-period` | Focus previous / next monitor (dwm `focusmon`; app Settings stays in the app menu) |
+| `cmd-shift-comma` / `cmd-shift-period` | Send the window to the previous / next monitor (dwm `tagmon`) |
 | `cmd-1` … `cmd-0` | **Summon** workspace 1–10 onto the focused monitor |
 | `cmd-shift-[` / `cmd-shift-]` | Move the **whole current workspace** to prev / next monitor |
 | `cmd-shift-tab` | Move current workspace to the next monitor |
@@ -53,7 +54,6 @@ Same keys as dwm (`desktop/linux/dwm/config.def.h`):
 | `cmd-shift-j` / `cmd-shift-k` | Swap the window with the next / previous one (dwm `movestack`) |
 | `cmd-h` / `cmd-l` | Shrink / grow the focused window (dwm `setmfact`) |
 | `cmd-shift-h` / `cmd-shift-l` | Move window left / right |
-| `cmd-shift-comma` / `cmd-shift-period` | Send window to the previous / next monitor (dwm `tagmon`) |
 | `cmd-m` | Toggle fullscreen |
 | `cmd-q` | Close focused window (intercepts the macOS "quit app" shortcut — quit via the app menu) |
 
@@ -158,7 +158,7 @@ To cover another browser, add a rule above the generic ones with its `app-id`
 
 - **[SketchyBar](https://github.com/FelixKratz/SketchyBar)** — status bar, triggered on workspace change and started on launch.
 - **[JankyBorders](https://github.com/FelixKratz/JankyBorders)** — active/inactive window borders, started on launch.
-- **[skhd](https://github.com/koekeishiya/skhd)** — owns ONLY the four `cmd-arrow` bindings
+- **[skhd](https://github.com/koekeishiya/skhd)** — owns ONLY the `cmd-left` / `cmd-right` bindings
   (config: `desktop/mac/skhd/skhdrc`, runs as a launchd service). Real arrow-key events carry
   an implicit `fn` modifier flag that AeroSpace's hotkey matching rejects, so AeroSpace
   never sees `cmd-arrows` from a physical keyboard; skhd's event tap does, and shells out
