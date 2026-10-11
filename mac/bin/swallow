@@ -1,0 +1,28 @@
+#!/bin/bash
+# swallow for AeroSpace, after dwm's: when a window opens whose process was started from a shell in a
+# terminal window, that terminal moves to the hidden workspace S until the process exits, then comes back.
+# Run by aerospace.toml (on-window-detected) for each new window. Shells note their window id in
+# /tmp/swallow-$USER/<shell pid> (desktop/mac/zsh/swallow.zsh). Apps started with `open` have launchd as
+# parent, not the shell, so they are never swallowed.
+export PATH=/opt/homebrew/bin:$PATH
+dir=/tmp/swallow-$USER hide=S
+[ -d "$dir" ] || exit 0
+mkdir -p "$dir/on"
+wins=$(aerospace list-windows --all --format '%{window-id}|%{app-pid}|%{workspace}|%{app-bundle-id}')
+while IFS='|' read -r wid pid ws bundle; do
+    case $bundle in net.kovidgoyal.kitty|org.alacritty) continue ;; esac   # dwm: isterminal
+    p=$pid term=
+    while [ "${p:-0}" -gt 1 ]; do                                          # the shell this app runs under
+        [ -f "$dir/$p" ] && { term=$(cat "$dir/$p"); break; }
+        p=$(ps -o ppid= -p "$p" | tr -d ' ')
+    done
+    [ -n "$term" ] && [ ! -e "$dir/on/$term" ] || continue                 # none, or already swallowed
+    tws=$(awk -F'|' -v w="$term" '$1 == w {print $3}' <<<"$wins")
+    [ -n "$tws" ] && [ "$tws" != "$hide" ] || continue                     # terminal window gone
+    echo "$tws" >"$dir/on/$term"
+    aerospace move-node-to-workspace --window-id "$term" "$hide"
+    ( while kill -0 "$pid" 2>/dev/null; do sleep 0.5; done
+      aerospace move-node-to-workspace --window-id "$term" "$tws"
+      aerospace focus --window-id "$term"
+      rm -f "$dir/on/$term" ) </dev/null >/dev/null 2>&1 &
+done <<<"$wins"

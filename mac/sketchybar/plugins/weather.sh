@@ -4,7 +4,7 @@
 source "$CONFIG_DIR/plugins/colors.sh"
 report="${XDG_DATA_HOME:-$HOME/.local/share}/weatherreport"
 brief="${report}_brief"
-[ "$SENDER" = mouse.clicked ] && { open -na Alacritty --args -e less -Srf "$report"; exit; }
+[ "$SENDER" = mouse.clicked ] && { $HOME/.local/bin/term less -Srf "$report"; exit; }
 
 if [ "$(stat -f %Sm -t %F "$report" 2>/dev/null)" != "$(date +%F)" ]; then
     mkdir -p "$(dirname "$report")"

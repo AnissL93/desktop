@@ -125,8 +125,13 @@ aerospace reload-config
 ## Auto window rules
 
 Defined via `on-window-detected` in `aerospace.toml`. Only the **first** matching
-rule runs, so order matters. Firefox opens on the current workspace.
+rule runs, so order matters (unless it sets `check-further-callbacks`). Firefox opens on the
+current workspace.
 
+- **Swallow** (every window, then the rules below): a window whose process was started from a
+  terminal's shell hides that terminal on workspace `S` until the process exits, like dwm's swallow
+  (`desktop/mac/bin/swallow`; shells note their window with `desktop/mac/zsh/swallow.zsh`). Apps
+  started with `open` are never swallowed.
 - **Firefox / Floorp Picture-in-Picture** → floating
 - **mpv** → floating
 

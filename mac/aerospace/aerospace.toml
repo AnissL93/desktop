@@ -114,7 +114,7 @@ cmd-shift-backslash = 'layout tiles horizontal vertical'
 
 
 # alt-enter = 'exec-and-forget open -n /Applications/Alacritty.app' # use Super + N to open new alacritty terminal
-cmd-enter = 'exec-and-forget open -n /Applications/Alacritty.app' # use Super + N to open new alacritty terminal 
+cmd-enter = 'exec-and-forget $HOME/.local/bin/term'          # kitty window (st on Linux), desktop/mac/bin/term
 cmd-e = 'exec-and-forget emacsclient -c --alternate-editor=emacs --no-wait $@'
 
 # Keys follow dwm on Linux (desktop/linux/dwm/config.def.h), with Cmd as Mod. dwm keys that are core
@@ -254,6 +254,13 @@ k = 'resize height -50'
 l = 'resize width +50'
 enter = 'mode main'
 esc = 'mode main'
+
+# --- swallow, as in dwm: an app started from a terminal hides that terminal until it exits
+# (desktop/mac/bin/swallow). First, and lets the rules below run too.
+[[on-window-detected]]
+if.during-aerospace-startup = false
+check-further-callbacks = true
+run = 'exec-and-forget $HOME/.local/bin/swallow'
 
 # --- Picture-in-Picture video: keep it FLOATING (never tiled) ---
 # NOTE on "sticky": AeroSpace cannot pin a window so it's visible on every
