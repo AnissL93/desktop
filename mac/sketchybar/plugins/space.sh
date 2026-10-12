@@ -1,6 +1,6 @@
 #!/bin/bash
 # Workspace $1 like a dwm tag (desktop/linux/dwm): its number icon, then one icon per app on it (dwm's
-# taglabel() and tagicons[]), highlighted when focused. Every workspace is always shown, as dwm's tags.
+# taglabel() and tagicons[]), highlighted when focused, dimmer when shown on another screen. Every workspace is always shown, as dwm's tags.
 source "$CONFIG_DIR/plugins/colors.sh"
 
 tags=(󰲠 󰲢 󰲤 󰲦 󰲨 󰲪 󰲬 󰲮 󰲰 󰿬)                                    # nf-md-numeric_N_circle, 1-10
@@ -27,8 +27,11 @@ while IFS= read -r app; do
 done < <(aerospace list-windows --workspace "$1" --format '%{app-name}' 2>/dev/null)
 
 focused=${AEROSPACE_FOCUSED_WORKSPACE:-$(aerospace list-workspaces --focused)}   # set by aerospace.toml
+visible=$(aerospace list-workspaces --monitor all --visible)                     # one per screen
 if [ "$1" = "$focused" ]; then
-    sketchybar --set "$NAME" label="$label" label.color="$SEL_FG" background.drawing=on
+    sketchybar --set "$NAME" label="$label" label.color="$SEL_FG" background.color="$SEL_BG" background.drawing=on
+elif grep -qx "$1" <<<"$visible"; then                                             # shown on another screen
+    sketchybar --set "$NAME" label="$label" label.color="$BAR_FG" background.color="$DIM" background.drawing=on
 else
     sketchybar --set "$NAME" label="$label" label.color="$BAR_FG" background.drawing=off
 fi

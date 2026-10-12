@@ -77,6 +77,11 @@ outer.right = 13
 # We want dwm-style behavior: a workspace is summoned onto whatever monitor
 # is currently focused (see the cmd-N bindings using 'summon-workspace').
 # Force-assigning a workspace would pin it to one monitor and break summoning.
+#
+# REQUIRED: macOS 'Displays have separate Spaces' must be OFF, or focus does not follow
+# workspace switches (worst for multi-window apps: Firefox, Emacs frames). Then log out:
+#   defaults write com.apple.spaces spans-displays -bool true
+# See https://nikitabobko.github.io/AeroSpace/guide#a-note-on-displays-have-separate-spaces
 
 # See https://nikitabobko.github.io/AeroSpace/guide#exec-env-vars
 [exec] # Again, you don't need to copy all config sections to your config.
@@ -132,7 +137,8 @@ cmd-comma = 'focus-monitor --wrap-around prev'                    # focusmon
 cmd-period = 'focus-monitor --wrap-around next'
 cmd-shift-comma = 'move-node-to-monitor --wrap-around prev'      # tagmon
 cmd-shift-period = 'move-node-to-monitor --wrap-around next'
-cmd-q = 'close'
+# close, then come back: macOS activates another app when a workspace empties, and AeroSpace follows it
+cmd-q = 'exec-and-forget a=/opt/homebrew/bin/aerospace; ws=$($a list-workspaces --focused); $a close; sleep 0.3; $a workspace "$ws"'
 
 cmd-m = 'fullscreen'
 # NOTE: cmd-arrow bindings are handled by skhd (~/.config/skhd/skhdrc), not here.
@@ -280,10 +286,11 @@ if.window-title-regex-substring = "Picture-in-Picture"
 if.during-aerospace-startup = false
 run = "layout floating"
 
+# mpv run as a bare binary has no bundle id, so match the app name (a title match also caught
+# terminals whose title mentions mpv). Tiled, on workspace 8.
 [[on-window-detected]]
-if.window-title-regex-substring = "mpv"
-if.during-aerospace-startup = false
-run =  "layout floating"
+if.app-name-regex-substring = '^mpv$'
+run = 'move-node-to-workspace 8'
 
 #exec-on-workspace-change = ['$HOME/.config/aerospace/scripts/on-ws-change.sh']
 
