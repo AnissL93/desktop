@@ -1,0 +1,67 @@
+#!/bin/sh
+# macOS counterpart of desktop/linux/bin/set-en-font and set-cjk-font, linked under both names
+# (links.txt); font-preset (desktop/linux/bin) calls them the same way on both systems.
+# Switches the Latin or Chinese font of kitty, alacritty, dmenu, SketchyBar, VS Code, Firefox and emacs.
+# usage: set-en-font  | set-cjk-font            show the current font
+#        set-en-font  "Family" | set-cjk-font "Family"
+# A pixel size argument (font-preset passes one) is ignored: each app keeps its Retina size.
+set -e
+
+ROOT="$HOME/System/personal-infra"
+DOT="$ROOT/dotfiles"
+KITTY="$DOT/kitty/kitty.conf"
+SBAR="$ROOT/desktop/mac/sketchybar/sketchybarrc"
+DMENU="$ROOT/desktop/mac/dmenu/dmenu.swift"
+
+EN=$(sed -n 's/^font_family  *//p' "$KITTY")
+CJK=$(sed -n 's/^symbol_map [^ ]* //p' "$KITTY")
+case "$(basename "$0")" in
+	set-cjk-font) KIND=cjk OLD=$CJK OTHER=$EN ;;
+	*)            KIND=en  OLD=$EN  OTHER=$CJK ;;
+esac
+
+if [ -z "$1" ]; then
+	echo "current: $OLD"
+	exit 0
+fi
+
+NEW="$1"
+if command -v fc-list >/dev/null; then
+	fc-list : family | tr ',' '\n' | grep -qxF "$NEW" || { echo "font not installed: $NEW" >&2; exit 1; }
+fi
+# the edits find each font by family name, so Latin and CJK must differ
+[ "$NEW" != "$OTHER" ] || { echo "$NEW is already the other font; pick another family" >&2; exit 1; }
+[ "$NEW" != "$OLD" ] || { echo "already $NEW"; exit 0; }
+
+# escape for sed: regex side and replacement side
+re() { printf '%s' "$1" | sed 's/[][\.*^$|/]/\\&/g'; }
+rp() { printf '%s' "$1" | sed 's/[\|&/]/\\&/g'; }
+O=$(re "$OLD") N=$(rp "$NEW")
+ed() { sed -i '' "$@"; }   # repo files are edited directly, so BSD sed never replaces a symlink
+
+if [ "$KIND" = en ]; then
+	ed "s/^font_family  *$O\$/font_family      $N/" "$KITTY"
+	ed "s/^normal.family = \"$O\"/normal.family = \"$N\"/" "$DOT/alacritty/alacritty.toml"
+	ed "s/^var fontName = \"$O\"/var fontName = \"$N\"/" "$DMENU"
+	ed "s/^TEXT=\"$O:/TEXT=\"$N:/" "$SBAR"
+	ed "s/^(setq cur-font \"$O\"/(setq cur-font \"$N\"/" "$DOT/doom/config.el"
+	ELISP="(progn (setq cur-font \"$NEW\") (setq doom-font (font-spec :family cur-font :size en-font-size)) (doom/reload-font))"
+else
+	ed "s/^\(symbol_map [^ ]*\) $O\$/\1 $N/" "$KITTY"
+	ed "s/\[.family: \"$O\"\]/[.family: \"$N\"]/" "$DMENU"
+	ed "s/^CJK=\"$O:/CJK=\"$N:/" "$SBAR"
+	ed "s/^      ch-font \"$O\"\$/      ch-font \"$N\"/" "$DOT/doom/config.el"
+	ELISP="(progn (setq ch-font \"$NEW\") (dolist (s '(han cjk-misc bopomofo kana)) (set-fontset-font t s (font-spec :family ch-font))))"
+	# alacritty has no fallback setting; macOS picks the CJK font itself
+fi
+# both kinds: VS Code ('Latin', 'CJK'), Firefox pages and UI ("Latin, CJK" / "Latin", "CJK")
+ed "s/'$O'/'$N'/g" "$DOT/vscode/settings-mac.json"
+ed "s/\"$O\"/\"$N\"/g; s/\"$O,/\"$N,/g; s/, $O\"/, $N\"/g" "$DOT/firefox/user.js" "$DOT/firefox/userChrome.css"
+
+# apply: kitty reloads its config on USR1, alacritty and VS Code watch their files
+pkill -USR1 -x kitty 2>/dev/null || true
+sketchybar --reload 2>/dev/null || true
+emacsclient --eval "$ELISP" >/dev/null 2>&1 || true
+swiftc -O "$DMENU" -o "$HOME/.local/bin/dmenu"
+
+echo "$KIND font: $OLD -> $NEW. Restart Firefox to see it there."
