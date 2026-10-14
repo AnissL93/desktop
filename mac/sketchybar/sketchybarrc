@@ -7,9 +7,9 @@
 PLUGINS="$CONFIG_DIR/plugins"
 source "$PLUGINS/colors.sh"
 
-TEXT="PxPlus IBM VGA 8x16:Regular:16.0"   # same as dmenu; 16 = native size, crisp
+TEXT="Fizzy Bubbles Code:Regular:16.0"   # same as dmenu; 16 = native size, crisp
 ICON="typicons:Regular:16.0"
-CJK="Cubic 11:Regular:16.0"
+CJK="StarLovePencil:Regular:16.0"
 TAGS="Symbols Nerd Font Mono:Regular:16.0"   # workspace + app icons, as dwm's tag font
 
 sketchybar --bar position=top height=32 color="$BAR_BG" \

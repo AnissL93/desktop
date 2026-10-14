@@ -4,6 +4,6 @@
 set -e
 case "$1" in
 	pixel)  set-en-font "PxPlus IBM VGA 8x16" 26.67; set-cjk-font "Cubic 11" 24 ;;
-	bubble) set-en-font "Fuzzy Bubbles Mono" 26.67;  set-cjk-font "StarLovePencil" 24 ;;
+	bubble) set-en-font "Fizzy Bubbles Code" 26.67;  set-cjk-font "StarLovePencil" 24 ;;
 	*) echo "usage: font-preset pixel|bubble   (current: $(set-en-font | head -1 | cut -d' ' -f2-) + $(set-cjk-font | cut -d' ' -f2-))" >&2; exit 1 ;;
 esac

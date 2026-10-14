@@ -14,7 +14,7 @@ import Cocoa
 // ---- options -------------------------------------------------------------------------------------
 
 var prompt = "", insensitive = false, bottom = false, lines = 0
-var fontName = "PxPlus IBM VGA 8x16"
+var fontName = "Fizzy Bubbles Code"
 let fontSize: CGFloat = 24, rowHeight: CGFloat = 36          // the SketchyBar font and height
 var nb = "#222222", nf = "#bbbbbb", sb = "#005577", sf = "#eeeeee"   // dmenu's own defaults
 
@@ -62,7 +62,7 @@ let (normBg, normFg, selBg, selFg) = (color(nb), color(nf), color(sb), color(sf)
 let font: NSFont = {
     let base = NSFont(descriptor: NSFontDescriptor(fontAttributes: [.family: fontName]), size: fontSize)
         ?? .monospacedSystemFont(ofSize: fontSize, weight: .regular)
-    let cjk = NSFontDescriptor(fontAttributes: [.family: "Cubic 11"])
+    let cjk = NSFontDescriptor(fontAttributes: [.family: "StarLovePencil"])
     return NSFont(descriptor: base.fontDescriptor.addingAttributes([.cascadeList: [cjk]]), size: fontSize) ?? base
 }()
 
