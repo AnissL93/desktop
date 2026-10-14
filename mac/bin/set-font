@@ -1,7 +1,7 @@
 #!/bin/sh
 # macOS counterpart of desktop/linux/bin/set-en-font and set-cjk-font, linked under both names
 # (links.txt); font-preset (desktop/linux/bin) calls them the same way on both systems.
-# Switches the Latin or Chinese font of kitty, alacritty, dmenu, SketchyBar, VS Code, Firefox and emacs.
+# Switches the Latin or Chinese font of kitty, alacritty, dmenu, SketchyBar, VS Code, Firefox, Obsidian and emacs.
 # usage: set-en-font  | set-cjk-font            show the current font
 #        set-en-font  "Family" | set-cjk-font "Family"
 # A pixel size argument (font-preset passes one) is ignored: each app keeps its Retina size.
@@ -57,6 +57,18 @@ fi
 # both kinds: VS Code ('Latin', 'CJK'), Firefox pages and UI ("Latin, CJK" / "Latin", "CJK")
 ed "s/'$O'/'$N'/g" "$DOT/vscode/settings-mac.json"
 ed "s/\"$O\"/\"$N\"/g; s/\"$O,/\"$N,/g; s/, $O\"/, $N\"/g" "$DOT/firefox/user.js" "$DOT/firefox/userChrome.css"
+# Obsidian: "Latin,CJK,<fallbacks>" for UI and text, Latin for code (read on start, synced vault)
+EN_NOW=$([ "$KIND" = en ] && echo "$NEW" || echo "$EN") CJK_NOW=$([ "$KIND" = cjk ] && echo "$NEW" || echo "$CJK") \
+python3 - "$HOME/Sync/WorkNotes/.obsidian/appearance.json" <<'EOF' || true
+import json, os, sys
+p = sys.argv[1]
+a = json.load(open(p))
+en, cjk = os.environ["EN_NOW"], os.environ["CJK_NOW"]
+for k in ("interfaceFontFamily", "textFontFamily"):
+    a[k] = ",".join([en, cjk] + a.get(k, "").split(",")[2:])
+a["monospaceFontFamily"] = en
+open(p, "w").write(json.dumps(a, indent=2, ensure_ascii=False) + "\n")
+EOF
 
 # apply: kitty reloads its config on USR1, alacritty and VS Code watch their files
 pkill -USR1 -x kitty 2>/dev/null || true
@@ -64,4 +76,4 @@ sketchybar --reload 2>/dev/null || true
 emacsclient --eval "$ELISP" >/dev/null 2>&1 || true
 swiftc -O "$DMENU" -o "$HOME/.local/bin/dmenu"
 
-echo "$KIND font: $OLD -> $NEW. Restart Firefox to see it there."
+echo "$KIND font: $OLD -> $NEW. Restart Firefox and Obsidian to see it there."
