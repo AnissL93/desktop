@@ -23,6 +23,11 @@ fcitx5 > /dev/null 2>&1 &
 # alacritty: same font size on both monitors (they have different DPI)
 export WINIT_X11_SCALE_FACTOR=1
 
+# Firefox hardware video decoding on the NVIDIA GPU (nvidia-vaapi-driver; prefs in dotfiles/firefox/user.js)
+export LIBVA_DRIVER_NAME=nvidia
+export NVD_BACKEND=direct
+export MOZ_DISABLE_RDD_SANDBOX=1
+
 xcompmgr &
 
 # first start on a new machine: generate the colour theme (bootstrap.sh can't without X)
