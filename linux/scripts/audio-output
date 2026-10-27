@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Pick the default audio output (PipeWire sink) via dmenu
+
+sink=$(wpctl status | sed -n '/Sinks:/,/Sources:/{p;/Sources:/q}' |
+    sed -nE 's/^[^0-9*]*(\*?)\s*([0-9]+)\. (.*[^ ])\s*\[vol.*/\2 \1\3/p' |
+    dmenu -i -p "Output:")
+
+[ -z "$sink" ] && exit
+
+wpctl set-default "${sink%% *}"
+notify-send "Audio" "Output: ${sink#* }" &
