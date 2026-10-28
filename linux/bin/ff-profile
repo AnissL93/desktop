@@ -1,7 +1,10 @@
 #!/bin/sh
-# Print the Firefox profile directory in use: the one whose prefs.js changed most recently.
-# Exit 1 if there is none yet (start Firefox once first). Linux and macOS profile folders.
-p=$(ls -t "$HOME"/.config/mozilla/firefox/*/prefs.js "$HOME"/.mozilla/firefox/*/prefs.js \
-    "$HOME"/Library/Application\ Support/Firefox/Profiles/*/prefs.js 2>/dev/null | head -1)
-[ -n "$p" ] || exit 1
-dirname "$p"
+# Print the Firefox profile directory in use: the one already holding our user.js link, else
+# the one whose prefs.js changed most recently (first bootstrap; other profiles such as profile-
+# group ones can write prefs.js later). Exit 1 if there is none yet (start Firefox once first).
+for f in user.js prefs.js; do
+	p=$(ls -t "$HOME"/.config/mozilla/firefox/*/$f "$HOME"/.mozilla/firefox/*/$f \
+	    "$HOME"/Library/Application\ Support/Firefox/Profiles/*/$f 2>/dev/null | head -1)
+	[ -n "$p" ] && { dirname "$p"; exit 0; }
+done
+exit 1

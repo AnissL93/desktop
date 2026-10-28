@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# vpn start [hy2|xray] | stop | status | proxy [on|off] | install
+# Local proxy: socks5 127.0.0.1:10808, http 127.0.0.1:10809
+
+CONF_DIR="$HOME/Projects/vpn/client"
+BIN_DIR="$HOME/.local/bin"
+RUN_DIR="$HOME/.cache/vpn"
+PID_FILE="$RUN_DIR/vpn.pid"
+LOG_FILE="$RUN_DIR/vpn.log"
+mkdir -p "$RUN_DIR" "$BIN_DIR"
+
+notify () { echo "$1"; command -v notify-send >/dev/null && notify-send "VPN" "$1"; }
+
+running () { [[ -f $PID_FILE ]] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; }
+
+install_bins () {
+    local tmp; tmp=$(mktemp -d)
+    if [[ ! -x $BIN_DIR/hysteria ]]; then
+        curl -fL -o "$BIN_DIR/hysteria" \
+            https://github.com/apernet/hysteria/releases/latest/download/hysteria-linux-amd64 \
+            && chmod +x "$BIN_DIR/hysteria"
+    fi
+    if [[ ! -x $BIN_DIR/xray ]]; then
+        curl -fL -o "$tmp/xray.zip" \
+            https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip \
+            && unzip -o -q "$tmp/xray.zip" xray -d "$BIN_DIR" && chmod +x "$BIN_DIR/xray"
+    fi
+    rm -rf "$tmp"
+}
+
+start () {
+    local proto=${1:-hy2}
+    running && stop
+    case $proto in
+        hy2|hysteria) cmd=("$BIN_DIR/hysteria" client -c "$CONF_DIR/hysteria2-client.yaml") ;;
+        xray)         cmd=("$BIN_DIR/xray" run -c "$CONF_DIR/xray-client.json") ;;
+        *) echo "unknown protocol: $proto (use hy2 or xray)"; exit 1 ;;
+    esac
+    [[ -x ${cmd[0]} ]] || { echo "${cmd[0]} not found, run: vpn install"; exit 1; }
+    nohup "${cmd[@]}" >"$LOG_FILE" 2>&1 &
+    echo $! >"$PID_FILE"
+    echo "$proto" >"$RUN_DIR/proto"
+    sleep 1
+    if running; then
+        notify "✅ Started $proto (socks5 :10808, http :10809)"
+    else
+        notify "❌ Failed to start $proto, see $LOG_FILE"; tail -n 5 "$LOG_FILE"; exit 1
+    fi
+}
+
+stop () {
+    if running; then
+        kill "$(cat "$PID_FILE")" && rm -f "$PID_FILE"
+        notify "❌ Stopped $(cat "$RUN_DIR/proto" 2>/dev/null)"
+    else
+        rm -f "$PID_FILE"; echo "not running"
+    fi
+}
+
+# System-wide proxy: gsettings (Firefox/GTK apps) + env file sourced by new shells
+proxy () {
+    local env_file="$RUN_DIR/proxy.env"
+    case $1 in
+        on)
+            running || start
+            gsettings set org.gnome.system.proxy mode manual
+            gsettings set org.gnome.system.proxy.socks host 127.0.0.1
+            gsettings set org.gnome.system.proxy.socks port 10808
+            gsettings set org.gnome.system.proxy.http host 127.0.0.1
+            gsettings set org.gnome.system.proxy.http port 10809
+            gsettings set org.gnome.system.proxy.https host 127.0.0.1
+            gsettings set org.gnome.system.proxy.https port 10809
+            gsettings set org.gnome.system.proxy ignore-hosts "['localhost', '127.0.0.0/8', '::1']"
+            cat >"$env_file" <<'EOF'
+export http_proxy=http://127.0.0.1:10809 https_proxy=http://127.0.0.1:10809
+export all_proxy=socks5h://127.0.0.1:10808 no_proxy=localhost,127.0.0.1,::1
+export HTTP_PROXY=$http_proxy HTTPS_PROXY=$https_proxy ALL_PROXY=$all_proxy NO_PROXY=$no_proxy
+EOF
+            notify "🌐 System proxy on" ;;
+        off)
+            gsettings set org.gnome.system.proxy mode none
+            rm -f "$env_file"
+            notify "🚫 System proxy off" ;;
+        *) echo "system proxy: $(gsettings get org.gnome.system.proxy mode)" ;;
+    esac
+}
+
+status () {
+    proxy
+    if running; then
+        echo "running: $(cat "$RUN_DIR/proto") (pid $(cat "$PID_FILE"))"
+        echo -n "exit ip: "; curl -s -m 10 -x socks5h://127.0.0.1:10808 https://ifconfig.me; echo
+    else
+        echo "stopped"
+    fi
+}
+
+case $1 in
+    start)   start "$2" ;;
+    stop)    stop; proxy off ;;
+    restart) stop; start "$2" ;;
+    status)  status ;;
+    proxy)   proxy "$2" ;;
+    install) install_bins ;;
+    *) echo "usage: vpn {start [hy2|xray]|stop|restart [hy2|xray]|status|proxy [on|off]|install}"; exit 1 ;;
+esac

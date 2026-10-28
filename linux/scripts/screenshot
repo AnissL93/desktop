@@ -8,10 +8,9 @@ else
     notify-send "Wrong screenshots path"
     exit 1
 fi
-mkdir -p "$screenshot_path"
-
 
 get_info() {
+    mkdir -p "$screenshot_path"
     tmp_file=/tmp/.screenshot_tmp
     rm -f $tmp_file
     flameshot $1 -p "$(realpath "$screenshot_path")" > $tmp_file 2>&1
@@ -22,7 +21,7 @@ get_info() {
 }
 
 
-action=$(echo -e "gui\nfull\ncur" | dmenu)
+action=$(echo -e "gui\nfull\ncur\nnotes" | dmenu)
 case $action in
     "gui")
         get_info gui
@@ -32,6 +31,10 @@ case $action in
         ;;
     "cur")
         get_info screen
+        ;;
+    "notes")
+        screenshot_path=/srv/sync/WorkNotes/Attachments/screenshots
+        get_info gui
         ;;
     *)
         exit
