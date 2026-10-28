@@ -1,5 +1,5 @@
 #!/bin/sh
-# Switch the Latin monospace font for dwm, dmenu, st, alacritty, firefox, vscode and emacs.
+# Switch the Latin monospace font for dwm, dmenu, st, alacritty, firefox, obsidian, vscode and emacs.
 # usage: set-en-font                      show current font and installed mono fonts
 #        set-en-font "Family" [pixelsize] switch font; sizes are kept unless pixelsize is given
 #                                         (pixel fonts: use multiples of their native size)
@@ -10,6 +10,7 @@ FF="$("$(dirname "$(readlink -f "$0")")/ff-profile")"   # current Firefox profil
 ALA="$HOME/.config/alacritty/alacritty.toml"
 FC="$HOME/.config/fontconfig/fonts.conf"
 DOOM="$HOME/System/dotfiles/doom/config.el"
+OBS=/srv/sync/WorkNotes/.obsidian/appearance.json   # vault that follows the desktop theme
 
 # current font = first entry of dwm fonts[]
 OLD=$(sed -n 's/^static const char \*fonts\[\] = {"\([^:"]*\):.*/\1/p' "$DWM/config.def.h")
@@ -40,7 +41,10 @@ sed -i --follow-symlinks "s/\"$O:pixelsize=\([0-9.]*\)\"/\"$N:pixelsize=${PX:-\1
 sed -i --follow-symlinks "s/family = \"$O\"/family = \"$N\"/" "$ALA"
 sed -i --follow-symlinks "s/<family>$O<\/family>/<family>$N<\/family>/" "$FC"
 # firefox (UI + all page fonts)
-sed -i --follow-symlinks "s/\"$O/\"$N/g" "$FF/user.js" "$FF/chrome/userChrome.css"
+sed -i --follow-symlinks "s/\\(user_pref(\"font\\.name[^\"]*\", \"\\)[^\",]*/\\1$N/" "$FF/user.js"
+sed -i --follow-symlinks "s/\\(font-family: \"\\)[^\"]*/\\1$N/" "$FF/chrome/userChrome.css"
+# obsidian (first entry of each font list; restart Obsidian to see it)
+[ -f "$OBS" ] && sed -i "s/\\(FontFamily\": \"\\)[^,\"]*/\\1$N/" "$OBS"
 # vscode (editor + integrated terminal)
 sed -i --follow-symlinks "s/\\(fontFamily\": \"\\)'[^']*'/\\1'$N'/" "$HOME/.config/Code/User/settings.json"
 # st (X resources) and the VS Code UI-font script

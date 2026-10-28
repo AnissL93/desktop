@@ -1,5 +1,5 @@
 #!/bin/sh
-# Switch the Chinese (CJK fallback) font for dwm, dmenu, st, alacritty, firefox, vscode and emacs.
+# Switch the Chinese (CJK fallback) font for dwm, dmenu, st, alacritty, firefox, obsidian, vscode and emacs.
 # usage: set-cjk-font                      show current font
 #        set-cjk-font "Family" [pixelsize] switch font; pixelsize applies to dwm, dmenu and st
 #                                          (pixel fonts: use a multiple of their grid, e.g. Cubic 11 -> 24)
@@ -8,6 +8,7 @@ set -e
 DWM="$HOME/System/personal-infra/desktop/linux/dwm"
 FF="$("$(dirname "$(readlink -f "$0")")/ff-profile")"   # current Firefox profile
 CODE="$HOME/.config/Code/User/settings.json"
+OBS=/srv/sync/WorkNotes/.obsidian/appearance.json   # vault that follows the desktop theme
 
 # current font = second entry of dwm fonts[]
 OLD=$(sed -n '/^static const char \*fonts\[\]/{n;s/^ *"\([^:"]*\):.*/\1/p;}' "$DWM/config.def.h")
@@ -37,8 +38,10 @@ sed -i --follow-symlinks "s/^st\.fontalt0: .*:pixelsize=\([0-9.]*\)/st.fontalt0:
 sed -i --follow-symlinks "s/<accept><family>$O<\/family><\/accept>/<accept><family>$N<\/family><\/accept>/" \
 	"$HOME/.config/fontconfig/fonts.conf"
 # firefox
-sed -i --follow-symlinks "s/, $O\"/, $N\"/" "$FF/user.js"
-sed -i --follow-symlinks "s/\"$O\"/\"$N\"/g; s/ $O for Chinese/ $N for Chinese/" "$FF/chrome/userChrome.css"
+sed -i --follow-symlinks "s/\\(user_pref(\"font\\.name-list[^\"]*\", \"[^\",]*, \\)[^\"]*/\\1$N/" "$FF/user.js"
+sed -i --follow-symlinks "s/\\(font-family: \"[^\"]*\", \"\\)[^\"]*/\\1$N/; s/ $O for Chinese/ $N for Chinese/" "$FF/chrome/userChrome.css"
+# obsidian (second entry of the UI/text font lists; restart Obsidian to see it)
+[ -f "$OBS" ] && sed -i "s/\\(\\(interface\\|text\\)FontFamily\": \"[^,\"]*,\\)[^,\"]*/\\1$N/" "$OBS"
 # vscode editor/terminal, and the UI-font script
 sed -i --follow-symlinks "s/\\(fontFamily\": \"'[^']*', \\)'[^']*'/\\1'$N'/" "$CODE"
 sed -i --follow-symlinks "s/^\\(FONT=\"'[^']*', \\)'[^']*'/\\1'$N'/" "$HOME/.local/bin/vscode-ui-font"
