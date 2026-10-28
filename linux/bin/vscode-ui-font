@@ -7,7 +7,7 @@
 set -e
 
 HTML=/usr/share/code/resources/app/out/vs/code/electron-browser/workbench/workbench.html
-FONT="'PxPlus IBM VGA 8x16', 'Cubic 11', monospace"
+FONT="'Fizzy Bubbles Code', 'StarLovePencil', monospace"
 
 CSS="<style id=\"amber-ui-font\">
 .monaco-workbench, .monaco-workbench .menubar, .monaco-menu-container, .monaco-workbench .monaco-list,

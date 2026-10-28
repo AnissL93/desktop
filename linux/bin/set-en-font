@@ -42,10 +42,10 @@ sed -i --follow-symlinks "s/<family>$O<\/family>/<family>$N<\/family>/" "$FC"
 # firefox (UI + all page fonts)
 sed -i --follow-symlinks "s/\"$O/\"$N/g" "$FF/user.js" "$FF/chrome/userChrome.css"
 # vscode (editor + integrated terminal)
-sed -i --follow-symlinks "s/'$O'/'$N'/g" "$HOME/.config/Code/User/settings.json"
+sed -i --follow-symlinks "s/\\(fontFamily\": \"\\)'[^']*'/\\1'$N'/" "$HOME/.config/Code/User/settings.json"
 # st (X resources) and the VS Code UI-font script
 sed -i --follow-symlinks "s/^st\.font: .*:pixelsize=\([0-9.]*\)/st.font: $N:pixelsize=${PX:-\1}/" "$HOME/.Xresources"
-sed -i --follow-symlinks "s/'$O'/'$N'/g" "$HOME/.local/bin/vscode-ui-font"
+sed -i --follow-symlinks "s/^FONT=\"'[^']*'/FONT=\"'$N'/" "$HOME/.local/bin/vscode-ui-font"
 # emacs
 sed -i --follow-symlinks "s/^(setq cur-font \"$O\"/(setq cur-font \"$N\"/" "$DOOM"
 

@@ -40,7 +40,8 @@ sed -i --follow-symlinks "s/<accept><family>$O<\/family><\/accept>/<accept><fami
 sed -i --follow-symlinks "s/, $O\"/, $N\"/" "$FF/user.js"
 sed -i --follow-symlinks "s/\"$O\"/\"$N\"/g; s/ $O for Chinese/ $N for Chinese/" "$FF/chrome/userChrome.css"
 # vscode editor/terminal, and the UI-font script
-sed -i --follow-symlinks "s/'$O'/'$N'/g" "$CODE" "$HOME/.local/bin/vscode-ui-font"
+sed -i --follow-symlinks "s/\\(fontFamily\": \"'[^']*', \\)'[^']*'/\\1'$N'/" "$CODE"
+sed -i --follow-symlinks "s/^\\(FONT=\"'[^']*', \\)'[^']*'/\\1'$N'/" "$HOME/.local/bin/vscode-ui-font"
 # emacs
 sed -i --follow-symlinks "s/^      ch-font \"$O\"$/      ch-font \"$N\"/" "$HOME/System/dotfiles/doom/config.el"
 
