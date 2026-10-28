@@ -32,7 +32,7 @@ O=$(re "$OLD") N=$(rp "$NEW")
 # dwm / dmenu fallback entry, st fallback font
 sed -i --follow-symlinks "s/\"$O:pixelsize=\([0-9.]*\)\"/\"$N:pixelsize=${PX:-\1}\"/" \
 	"$DWM/config.def.h" "$DWM/dmenu/config.def.h"
-sed -i --follow-symlinks "s/^st\.fontalt0: $O:pixelsize=\([0-9.]*\)/st.fontalt0: $N:pixelsize=${PX:-\1}/" "$HOME/.Xresources"
+sed -i --follow-symlinks "s/^st\.fontalt0: .*:pixelsize=\([0-9.]*\)/st.fontalt0: $N:pixelsize=${PX:-\1}/" "$HOME/.Xresources"
 # alacritty (fontconfig alias)
 sed -i --follow-symlinks "s/<accept><family>$O<\/family><\/accept>/<accept><family>$N<\/family><\/accept>/" \
 	"$HOME/.config/fontconfig/fonts.conf"

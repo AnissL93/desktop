@@ -44,7 +44,7 @@ sed -i --follow-symlinks "s/\"$O/\"$N/g" "$FF/user.js" "$FF/chrome/userChrome.cs
 # vscode (editor + integrated terminal)
 sed -i --follow-symlinks "s/'$O'/'$N'/g" "$HOME/.config/Code/User/settings.json"
 # st (X resources) and the VS Code UI-font script
-sed -i --follow-symlinks "s/^st\.font: $O:/st.font: $N:/" "$HOME/.Xresources"
+sed -i --follow-symlinks "s/^st\.font: .*:pixelsize=\([0-9.]*\)/st.font: $N:pixelsize=${PX:-\1}/" "$HOME/.Xresources"
 sed -i --follow-symlinks "s/'$O'/'$N'/g" "$HOME/.local/bin/vscode-ui-font"
 # emacs
 sed -i --follow-symlinks "s/^(setq cur-font \"$O\"/(setq cur-font \"$N\"/" "$DOOM"

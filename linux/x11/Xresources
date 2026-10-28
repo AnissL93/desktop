@@ -3,7 +3,7 @@
 Xcursor.size: 32
 
 ! st: fonts and layout ("st." beats the pywal *.colorN entries)
-st.font: PxPlus IBM VGA 8x16:pixelsize=26.67
-st.fontalt0: Cubic 11:pixelsize=24
+st.font: Fizzy Bubbles Code:pixelsize=26.67
+st.fontalt0: StarLovePencil:pixelsize=24
 st.alpha: 1.0
 st.borderpx: 24
